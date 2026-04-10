@@ -60,6 +60,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.requestId = randomUUID();
 	event.locals.user = null;
 
+	const authDisabled = true;
 	const maintenance = env.MAINTENANCE_MODE === '1';
 	if (
 		maintenance &&
@@ -81,8 +82,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const authBypass = env.AUTH_BYPASS === '1';
+	const authBypass = authDisabled || env.AUTH_BYPASS === '1';
 	if (authBypass) {
+		if (
+			event.url.pathname === '/' ||
+			event.url.pathname.startsWith('/auth')
+		) {
+			throw redirect(302, '/dashboard');
+		}
+
 		try {
 			const user = await ensureBypassUser();
 			event.locals.user = {
