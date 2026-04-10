@@ -14,6 +14,19 @@
 	--radius-base: 8px;
 }
 
+[data-theme='dark'] {
+	--color-primary: #6366f1;
+	--color-secondary: #38bdf8;
+	--color-success: #22c55e;
+	--color-warning: #f59e0b;
+	--color-urgent: #ef4444;
+	--color-background: #0f172a;
+	--color-surface: #111827;
+	--color-text-primary: #f8fafc;
+	--color-text-secondary: #cbd5f5;
+	--color-border: #1f2937;
+}
+
 @theme inline {
 	--color-primary: var(--color-primary);
 	--color-secondary: var(--color-secondary);

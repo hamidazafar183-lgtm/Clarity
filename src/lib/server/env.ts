@@ -16,7 +16,9 @@ const envSchema = z.object({
 	EMAIL_FROM: z.string().optional(),
 	APP_BASE_URL: z.string().url().optional(),
 	REQUIRE_EMAIL_VERIFICATION: z.string().optional(),
-	CRON_SECRET: z.string().optional()
+	CRON_SECRET: z.string().optional(),
+	SENTRY_DSN: z.string().optional(),
+	LOG_SLOW_QUERIES_MS: z.string().optional()
 });
 
 const parsed = envSchema.safeParse(process.env);

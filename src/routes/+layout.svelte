@@ -5,11 +5,17 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import OnboardingTour from '$lib/components/system/OnboardingTour.svelte';
 	import Toast from '$lib/components/ui/Toast.svelte';
+	import { initObservability } from '$lib/observability/client';
 	import { registerPwa } from '$lib/pwa/register';
 
 	let { children } = $props();
 
 	onMount(() => {
+		const stored = localStorage.getItem('clarity_theme');
+		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		const theme = stored ?? (prefersDark ? 'dark' : 'light');
+		document.documentElement.setAttribute('data-theme', theme);
+		initObservability();
 		registerPwa();
 	});
 </script>

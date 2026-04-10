@@ -26,27 +26,27 @@
 		error = null;
 
 		try {
-			const [overviewRes, tasksRes, habitsRes, focusRes] = await Promise.all([
-				apiRequest<{ week: typeof overview.week; month: typeof overview.month; error?: string }>('/api/analytics/overview'),
-				apiRequest<{ points?: Array<{ label: string; completed: number; created: number }>; error?: string }>('/api/analytics/tasks'),
-				apiRequest<{ heatmap?: Array<{ date: string; count: number }>; error?: string }>('/api/analytics/habits'),
-				apiRequest<{ sessions?: Array<{ startedAt: string; durationMinutes: number; interruptions: number }>; error?: string }>('/api/analytics/focus')
-			]);
+			const dashboardRes = await apiRequest<{
+				overview?: typeof overview;
+				points?: Array<{ label: string; completed: number; created: number }>;
+				heatmap?: Array<{ date: string; count: number }>;
+				sessions?: Array<{ startedAt: string; durationMinutes: number; interruptions: number }>;
+				error?: string;
+			}>('/api/analytics/dashboard');
 
-			if (!overviewRes.ok || !tasksRes.ok || !habitsRes.ok || !focusRes.ok) {
-				error =
-					overviewRes.error ?? tasksRes.error ?? habitsRes.error ?? focusRes.error ?? 'Unable to load analytics';
+			if (!dashboardRes.ok) {
+				error = dashboardRes.error ?? 'Unable to load analytics';
 				return;
 			}
 
-			overview = overviewRes.data ?? overview;
-			taskPoints = (tasksRes.data?.points ?? []).map((point) => ({
+			overview = dashboardRes.data?.overview ?? overview;
+			taskPoints = (dashboardRes.data?.points ?? []).map((point) => ({
 				label: point.label,
 				value: point.completed,
 				secondaryValue: point.created
 			}));
-			habitHeatmap = habitsRes.data?.heatmap ?? [];
-			focusSessions = focusRes.data?.sessions ?? [];
+			habitHeatmap = dashboardRes.data?.heatmap ?? [];
+			focusSessions = dashboardRes.data?.sessions ?? [];
 		} catch {
 			error = 'Unable to load analytics';
 		} finally {

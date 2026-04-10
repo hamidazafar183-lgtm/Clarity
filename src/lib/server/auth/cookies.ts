@@ -6,11 +6,12 @@ import {
 	REFRESH_COOKIE,
 	REFRESH_TOKEN_TTL_SECONDS
 } from '$lib/server/auth/constants';
+import { env } from '$lib/server/env';
 
 const baseCookieOptions = {
 	httpOnly: true,
 	sameSite: 'lax' as const,
-	secure: true,
+	secure: env.NODE_ENV === 'production',
 	path: '/'
 };
 

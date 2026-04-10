@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
 import { env } from '$env/dynamic/private';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
 
 import { ACCESS_COOKIE } from '$lib/server/auth/constants';
 import { verifyAccessToken } from '$lib/server/auth/jwt';
 import { rotateSession, touchSession } from '$lib/server/auth/service';
+import { captureError, initServerObservability } from '$lib/server/observability';
 import { prisma } from '$lib/server/prisma';
 import { ensurePersonalWorkspace } from '$lib/server/workspace';
 
@@ -55,6 +56,7 @@ async function ensureBypassUser() {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	initServerObservability();
 	event.locals.requestId = randomUUID();
 	event.locals.user = null;
 
@@ -155,4 +157,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('access-control-allow-credentials', 'true');
 
 	return response;
+};
+
+export const handleError: HandleServerError = ({ error, event }) => {
+	captureError(error, { requestId: event.locals.requestId, path: event.url.pathname });
 };
